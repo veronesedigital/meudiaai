@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "857099851799",
+    "project_id": "meu-dia-ai",
+    "storage_bucket": "meu-dia-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:857099851799:android:e1c5308c35ae8858702452",
+        "android_client_info": {
+          "package_name": "com.veronesedigital.meudiaai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeHTM2pDEYs3wfY7xgXPhuiwPxbzjrarQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

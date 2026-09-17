@@ -8,7 +8,7 @@ export default function LoginScreen({ onLoginSuccess }) {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: '182954829654-2jr783b73shi947lbuf7vb0osuo0oi04.apps.googleusercontent.com',
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '857099851799-apis4443ol9gr7nh5peq3kggkgdm6mi0.apps.googleusercontent.com',
     });
   }, []);
 

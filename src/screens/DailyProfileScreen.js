@@ -11,20 +11,21 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DropDownPicker from 'react-native-dropdown-picker';
+import RadioButton from '../components/RadioButton';
 
 const estadoCivilOptions = [
-  { label: 'Solteiro', value: 'solteiro' },
-  { label: 'Casado', value: 'casado' },
+  { label: 'Solteiro', value: 'solteiro(a)' },
+  { label: 'Casado', value: 'casado(a)' },
   { label: 'Namorando', value: 'namorando' },
   { label: 'Outros', value: 'outros' },
 ];
 
-const orientacaoSexualOptions = [
-  { label: 'Heterossexual', value: 'heterossexual' },
-  { label: 'Homossexual', value: 'homossexual' },
-  { label: 'Bissexual', value: 'bissexual' },
-  { label: 'Outros', value: 'outros' },
+const generoOptions = [
+  { label: 'Feminino', value: 'feminino' },
+  { label: 'Masculino', value: 'masculino' },
+  { label: 'Não-binário', value: 'não-binário' },
+  { label: 'Outro', value: 'outro' },
+  { label: 'Prefiro não responder', value: 'prefiro não responder' },
 ];
 
 const isValidBirthDate = (value) => {
@@ -50,9 +51,8 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
   const [nome, setNome] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
   const [estadoCivil, setEstadoCivil] = useState(null);
-  const [orientacaoSexual, setOrientacaoSexual] = useState(null);
-  const [openEstadoCivil, setOpenEstadoCivil] = useState(false);
-  const [openOrientacaoSexual, setOpenOrientacaoSexual] = useState(false);
+  const [genero, setGenero] = useState(null);
+  const [outroGenero, setOutroGenero] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const formatDate = (text) => {
@@ -82,8 +82,8 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
       return;
     }
 
-    if (!orientacaoSexual) {
-      Alert.alert('Atenção', 'Selecione a sua orientação sexual.');
+    if (!genero) {
+      Alert.alert('Atenção', 'Selecione o seu gênero.');
       return;
     }
 
@@ -95,7 +95,7 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
           nome: nome.trim(),
           dataNascimento,
           estadoCivil,
-          orientacaoSexual,
+          genero: genero === 'outro' && outroGenero.trim() ? outroGenero.trim() : genero,
         });
       }
     } catch (error) {
@@ -121,9 +121,6 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.greetingCard}>
-            <Text style={styles.greetingText}>Olá, {labelName}</Text>
-          </View>
 
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>Nome *</Text>
@@ -150,36 +147,28 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
 
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>Estado civil *</Text>
-            <DropDownPicker
-              open={openEstadoCivil}
-              value={estadoCivil}
-              items={estadoCivilOptions}
-              setOpen={setOpenEstadoCivil}
-              setValue={setEstadoCivil}
-              placeholder="Selecione"
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              containerStyle={styles.dropdownContainer}
-              zIndex={3000}
-              zIndexInverse={1000}
+            <RadioButton
+              options={estadoCivilOptions}
+              selectedOption={estadoCivil}
+              onSelect={setEstadoCivil}
             />
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Orientação sexual *</Text>
-            <DropDownPicker
-              open={openOrientacaoSexual}
-              value={orientacaoSexual}
-              items={orientacaoSexualOptions}
-              setOpen={setOpenOrientacaoSexual}
-              setValue={setOrientacaoSexual}
-              placeholder="Selecione"
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              containerStyle={styles.dropdownContainer}
-              zIndex={2000}
-              zIndexInverse={3000}
+            <Text style={styles.label}>Gênero *</Text>
+            <RadioButton
+              options={generoOptions}
+              selectedOption={genero}
+              onSelect={setGenero}
             />
+            {genero === 'outro' && (
+              <TextInput
+                style={styles.input}
+                value={outroGenero}
+                onChangeText={setOutroGenero}
+                placeholder="Campo de texto opcional"
+              />
+            )}
           </View>
 
           <TouchableOpacity
@@ -250,20 +239,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
-  },
-  dropdownContainer: {
-    width: '100%',
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    minHeight: 48,
-  },
-  dropdownText: {
     fontSize: 16,
     color: '#333',
   },

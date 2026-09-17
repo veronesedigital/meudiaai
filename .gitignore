@@ -41,6 +41,15 @@ yarn-error.*
 /ios
 /android
 
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+
+# Android signing / secrets
+keystore.properties
+*.keystore
+
 # builds
 *.aab
 *.apk

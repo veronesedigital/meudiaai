@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import LoginScreen from './src/screens/LoginScreen';
 import DailyProfileScreen from './src/screens/DailyProfileScreen';
 import DailyForecastResultScreen from './src/screens/DailyForecastResultScreen';
@@ -20,12 +21,16 @@ const getDateKey = (date = new Date()) => {
 };
 
 const normalizeUser = (userData) => {
-  const user = userData?.user || userData || {};
+  const responseUser = userData?.data?.user || userData?.user || userData || {};
+  const fallbackUser = userData?.data || userData || {};
+  const user = responseUser || fallbackUser || {};
+
   return {
     ...userData,
+    ...fallbackUser,
     ...user,
-    email: (user.email || userData?.email || '').trim().toLowerCase(),
-    name: user.name || user.displayName || userData?.name || 'Usuário',
+    email: (user.email || fallbackUser?.email || userData?.email || '').trim().toLowerCase(),
+    name: user.name || user.displayName || fallbackUser?.name || userData?.name || 'Usuário',
   };
 };
 
@@ -107,8 +112,9 @@ export default function App() {
     setCurrentScreen('profile');
   };
 
-  const handleGenerateForecast = async ({ nome, dataNascimento, estadoCivil, orientacaoSexual }) => {
+  const handleGenerateForecast = async ({ nome, dataNascimento, estadoCivil, genero }) => {
     const email = userInfo?.email;
+    setUserInfo((currentUser) => ({ ...currentUser, name: nome }));
 
     const existingForecast = await getTodayForecast(email);
     if (existingForecast?.content) {
@@ -123,7 +129,7 @@ export default function App() {
         nome,
         dataNascimento,
         estadoCivil,
-        orientacaoSexual,
+        genero,
       });
 
       if (!result) {
@@ -132,7 +138,7 @@ export default function App() {
 
       await saveTodayForecast(email, result);
       setForecastContent(result);
-      setShowBackButton(true);
+      setShowBackButton(false);
       setCurrentScreen('forecast');
     } catch (error) {
       console.error('Forecast generation error:', error);
@@ -183,6 +189,19 @@ export default function App() {
     }
   };
 
+  const handleUseAnotherAccount = async () => {
+    try {
+      await GoogleSignin.signOut();
+    } catch (error) {
+      console.warn('Google signOut on account switch failed:', error);
+    }
+
+    setUserInfo(null);
+    setForecastContent('');
+    setShowBackButton(true);
+    setCurrentScreen('login');
+  };
+
   const renderScreen = () => {
     if (currentScreen === 'login') {
       return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
@@ -197,7 +216,10 @@ export default function App() {
         <DailyForecastResultScreen
           forecastContent={forecastContent}
           onGoBack={handleGoBack}
+          onUseAnotherAccount={handleUseAnotherAccount}
           showBackButton={showBackButton}
+          userName={userInfo?.name || 'Usuário'}
+          forecastDate={new Date()}
         />
       );
     }

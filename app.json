@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Meu dia AI",
-    "slug": "meu-dia-AI-app",
+    "slug": "meu-dia-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.veronesedigital.meudiaai"
+      "bundleIdentifier": "com.veronesedigital.meu_dia_ai"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +24,7 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "edgeToEdgeEnabled": true,
-      "package": "com.veronesedigital.meudiaai",
+      "package": "com.veronesedigital.meu_dia_ai",
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -35,8 +35,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "816d5293-fd0a-481c-9b46-25684c358f56" 
+        "projectId": "2c94e35e-84d7-48dc-90e0-da73f27c591d"
       }
-    }
+    },
+    "owner": "veronesedigital"
   }
 }

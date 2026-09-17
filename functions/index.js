@@ -7,9 +7,10 @@ const { generateUserPromptMeuDia } = require('./prompts/userPromptMeuDia');
 
 const openaiKey = defineSecret('OPENAI_API_KEY');
 
-const OPENAI_MODEL = 'gpt-4o';
-const OPENAI_TIMEOUT = 120000;
-const OPENAI_MAX_TOKENS = 3000;
+const OPENAI_MODEL = process.env.EXPO_PUBLIC_OPENAI_MODEL || 'gpt-4o';
+const OPENAI_TIMEOUT = Number(process.env.EXPO_PUBLIC_OPENAI_TIMEOUT || 120000);
+const OPENAI_MAX_TOKENS = Number(process.env.EXPO_PUBLIC_OPENAI_MAX_OUTPUT_TOKENS || 3000);
+const OPENAI_TEMPERATURE = Number(process.env.EXPO_PUBLIC_OPENAI_TEMPERATURE || 0.7);
 
 exports.generateDailyForecast = onCall(
   { region: 'southamerica-east1', secrets: [openaiKey], timeoutSeconds: 300 },
@@ -31,7 +32,7 @@ exports.generateDailyForecast = onCall(
         model: OPENAI_MODEL,
         messages,
         max_tokens: OPENAI_MAX_TOKENS,
-        temperature: 0.7,
+        temperature: OPENAI_TEMPERATURE,
       },
       {
         headers: {

@@ -9,10 +9,47 @@
       "client_info": {
         "mobilesdk_app_id": "1:857099851799:android:e1c5308c35ae8858702452",
         "android_client_info": {
-          "package_name": "com.veronesedigital.meudiaai"
+          "package_name": "com.veronesedigital.meu_dia_ai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "857099851799-5d6g65u9ed8a68g26pr91efeat0ucqov.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.veronesedigital.meu_dia_ai",
+            "certificate_hash": "2676f3367fb0d1c38be250054f3059d8fe867931"
+          }
+        },
+        {
+          "client_id": "857099851799-g1rp8frtg4l8n14aoq6rnckv8lfemd6c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.veronesedigital.meu_dia_ai",
+            "certificate_hash": "fad7de3621b72c97b44ff57a692bd0c0e1d1fe33"
+          }
+        },
+        {
+          "client_id": "857099851799-s8j79j8cut6u398v2tptieqrnvcitp69.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.veronesedigital.meu_dia_ai",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "857099851799-u2tatbn3hibqahel3q0djatvf8d903j1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.veronesedigital.meu_dia_ai",
+            "certificate_hash": "5d72739bffe14a4e66e719d146b9ded205667d8f"
+          }
+        },
+        {
+          "client_id": "857099851799-apis4443ol9gr7nh5peq3kggkgdm6mi0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDeHTM2pDEYs3wfY7xgXPhuiwPxbzjrarQ"
@@ -20,7 +57,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "857099851799-apis4443ol9gr7nh5peq3kggkgdm6mi0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

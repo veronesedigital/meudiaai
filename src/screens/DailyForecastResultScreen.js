@@ -3,26 +3,58 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 
-export default function DailyForecastResultScreen({ forecastContent, onGoBack, showBackButton = true }) {
-  const content = forecastContent || 'Sem previsão disponível.';
+export default function DailyForecastResultScreen({
+  forecastContent,
+  onGoBack,
+  onUseAnotherAccount,
+  showBackButton = true,
+  userName = 'Usuário',
+  forecastDate = new Date(),
+}) {
+  const rawContent = forecastContent || 'Sem previsão disponível.';
+  const content = rawContent
+    .split(/\r?\n\s*\r?\n/)
+    .filter((paragraph) => !paragraph.trimStart().startsWith('Previsão para'))
+    .join('\n\n');
+
+  const formatDate = (date) => {
+    const value = date instanceof Date ? date : new Date(date);
+    if (Number.isNaN(value.getTime())) {
+      return '—';
+    }
+
+    const day = String(value.getDate()).padStart(2, '0');
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const year = value.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Meu dia AI</Text>
+        <Text style={styles.headerSubtitle}>Previsão para {userName} em {formatDate(forecastDate)}</Text>
       </View>
 
       <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
         <Markdown style={markdownStyles}>{content}</Markdown>
       </ScrollView>
 
-      {showBackButton && (
-        <View style={styles.footer}>
+      <View style={styles.footer}>
+        {showBackButton && (
           <TouchableOpacity style={styles.backButton} onPress={onGoBack}>
             <Text style={styles.backButtonText}>Voltar</Text>
           </TouchableOpacity>
-        </View>
-      )}
+        )}
+
+        <TouchableOpacity
+          style={[styles.secondaryButton, showBackButton && styles.secondaryButtonWithMargin]}
+          onPress={onUseAnotherAccount}
+        >
+          <Text style={styles.secondaryButtonText}>Logar com outro email</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -44,6 +76,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  headerSubtitle: {
+    marginTop: 8,
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   scrollContainer: {
     flex: 1,
   },
@@ -62,11 +101,28 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
+    marginBottom: 12,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  secondaryButton: {
+    backgroundColor: '#f2f2f2',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  secondaryButtonWithMargin: {
+    marginTop: 0,
+  },
+  secondaryButtonText: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

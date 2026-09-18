@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RadioButton from '../components/RadioButton';
+import { obterPosicoesAstrologicas } from '../services/astronomyServiceMeuDia';
 
 const estadoCivilOptions = [
   { label: 'Solteiro', value: 'solteiro(a)' },
@@ -54,6 +55,7 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
   const [genero, setGenero] = useState(null);
   const [outroGenero, setOutroGenero] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const posicoes = useMemo(() => obterPosicoesAstrologicas(), []);
 
   const formatDate = (text) => {
     const digits = text.replace(/\D/g, '').slice(0, 8);
@@ -96,6 +98,7 @@ export default function DailyProfileScreen({ onGenerateForecast, user }) {
           dataNascimento,
           estadoCivil,
           genero: genero === 'outro' && outroGenero.trim() ? outroGenero.trim() : genero,
+          posicoes,
         });
       }
     } catch (error) {

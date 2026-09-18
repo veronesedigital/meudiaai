@@ -22,7 +22,7 @@ export default function LoginScreen({ onLoginSuccess }) {
         setTimeout(() => {
           if (onLoginSuccess) {
             onLoginSuccess({
-              user: { name: 'Usuário Teste', email: 'teste@meudia.ai' },
+              user: { name: 'Usuário Teste 01', email: 'teste01@meudia.ai' },
             });
           }
           setLoading(false);

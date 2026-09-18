@@ -55,13 +55,15 @@ const getTodayForecast = async (email) => {
   }
 };
 
-const saveTodayForecast = async (email, content) => {
+const saveTodayForecast = async (email, content, posicoes = {}, dataNascimento = '') => {
   if (!email) return;
 
   const payload = JSON.stringify({
     date: getDateKey(),
     email: email.trim().toLowerCase(),
     content,
+    posicoes,
+    dataNascimento,
   });
 
   await AsyncStorage.setItem(getForecastKey(email), payload);
@@ -93,6 +95,8 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
   const [userInfo, setUserInfo] = useState(null);
   const [forecastContent, setForecastContent] = useState('');
+  const [forecastPositions, setForecastPositions] = useState({});
+  const [forecastBirthDate, setForecastBirthDate] = useState('');
   const [showBackButton, setShowBackButton] = useState(true);
 
   const handleLoginSuccess = async (userData) => {
@@ -102,23 +106,29 @@ export default function App() {
     const savedForecast = await getTodayForecast(normalizedUser.email);
     if (savedForecast?.content) {
       setForecastContent(savedForecast.content);
+      setForecastPositions(savedForecast.posicoes || {});
+      setForecastBirthDate(savedForecast.dataNascimento || '');
       setShowBackButton(false);
       setCurrentScreen('forecast');
       return;
     }
 
     setForecastContent('');
+    setForecastPositions({});
+    setForecastBirthDate('');
     setShowBackButton(true);
     setCurrentScreen('profile');
   };
 
-  const handleGenerateForecast = async ({ nome, dataNascimento, estadoCivil, genero }) => {
+  const handleGenerateForecast = async ({ nome, dataNascimento, estadoCivil, genero, posicoes }) => {
     const email = userInfo?.email;
     setUserInfo((currentUser) => ({ ...currentUser, name: nome }));
 
     const existingForecast = await getTodayForecast(email);
     if (existingForecast?.content) {
       setForecastContent(existingForecast.content);
+      setForecastPositions(existingForecast.posicoes || {});
+      setForecastBirthDate(existingForecast.dataNascimento || dataNascimento || '');
       setShowBackButton(false);
       setCurrentScreen('forecast');
       return;
@@ -130,19 +140,23 @@ export default function App() {
         dataNascimento,
         estadoCivil,
         genero,
+        posicoes,
       });
 
       if (!result) {
         throw new Error('Sem retorno da API');
       }
 
-      await saveTodayForecast(email, result);
+      await saveTodayForecast(email, result, posicoes, dataNascimento);
+      setForecastPositions(posicoes || {});
+      setForecastBirthDate(dataNascimento || '');
       setForecastContent(result);
       setShowBackButton(false);
       setCurrentScreen('forecast');
     } catch (error) {
       console.error('Forecast generation error:', error);
       setForecastContent('');
+      setForecastBirthDate('');
       setShowBackButton(true);
       setCurrentScreen('profile');
       throw new Error('Não foi possível retornar a previsão neste momento. Tente novamente');
@@ -155,12 +169,15 @@ export default function App() {
 
     if (savedForecast?.content) {
       setForecastContent(savedForecast.content);
+      setForecastPositions(savedForecast.posicoes || {});
+      setForecastBirthDate(savedForecast.dataNascimento || '');
       setShowBackButton(false);
       setCurrentScreen('forecast');
       return;
     }
 
     setForecastContent('');
+    setForecastBirthDate('');
     setShowBackButton(true);
     setCurrentScreen('profile');
   };
@@ -177,6 +194,8 @@ export default function App() {
       const savedForecast = await getTodayForecast(userInfo?.email);
       if (savedForecast?.content) {
         setForecastContent(savedForecast.content);
+        setForecastPositions(savedForecast.posicoes || {});
+        setForecastBirthDate(savedForecast.dataNascimento || '');
         setShowBackButton(false);
         setCurrentScreen('forecast');
         return;
@@ -198,6 +217,8 @@ export default function App() {
 
     setUserInfo(null);
     setForecastContent('');
+    setForecastPositions({});
+    setForecastBirthDate('');
     setShowBackButton(true);
     setCurrentScreen('login');
   };
@@ -220,6 +241,8 @@ export default function App() {
           showBackButton={showBackButton}
           userName={userInfo?.name || 'Usuário'}
           forecastDate={new Date()}
+          posicoes={forecastPositions}
+          dataNascimento={forecastBirthDate}
         />
       );
     }

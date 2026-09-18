@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
+import { obterPosicoesAstrologicas, obterSignoNatal } from '../services/astronomyServiceMeuDia';
 
 export default function DailyForecastResultScreen({
   forecastContent,
@@ -10,11 +11,26 @@ export default function DailyForecastResultScreen({
   showBackButton = true,
   userName = 'Usuário',
   forecastDate = new Date(),
+  posicoes = {},
+  dataNascimento = '',
 }) {
+  const posicoesExibidas = useMemo(() => {
+    if (posicoes.sol && posicoes.lua && posicoes.marte) {
+      return posicoes;
+    }
+
+    return obterPosicoesAstrologicas();
+  }, [posicoes]);
+
+  const signoNatal = useMemo(() => obterSignoNatal(dataNascimento), [dataNascimento]);
+
   const rawContent = forecastContent || 'Sem previsão disponível.';
   const content = rawContent
     .split(/\r?\n\s*\r?\n/)
-    .filter((paragraph) => !paragraph.trimStart().startsWith('Previsão para'))
+    .filter((paragraph) => {
+      const normalizedParagraph = paragraph.replace(/^\s*#{1,6}\s*/, '').trimStart();
+      return !normalizedParagraph.includes('Previsão');
+    })
     .join('\n\n');
 
   const formatDate = (date) => {
@@ -35,6 +51,12 @@ export default function DailyForecastResultScreen({
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Meu dia AI</Text>
         <Text style={styles.headerSubtitle}>Previsão para {userName} em {formatDate(forecastDate)}</Text>
+        {signoNatal && (
+          <Text style={styles.signoText}>Você é do signo de {signoNatal}.</Text>
+        )}
+        <Text style={styles.transitsText}>
+          Trânsitos de hoje: Sol em {posicoesExibidas.sol || ''}, Lua em {posicoesExibidas.lua || ''}, Marte em {posicoesExibidas.marte || ''}.
+        </Text>
       </View>
 
       <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
@@ -81,6 +103,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+    textAlign: 'center',
+  },
+  signoText: {
+    marginTop: 6,
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  transitsText: {
+    marginTop: 6,
+    color: '#fff',
+    fontSize: 13,
     textAlign: 'center',
   },
   scrollContainer: {

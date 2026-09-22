@@ -1,4 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
 
 // Configuração do projeto Firebase (participa-ai-83641)
@@ -15,4 +16,5 @@ const firebaseConfig = {
 // Evita inicializar o app mais de uma vez (hot reload)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
+export const auth = getAuth(app);
 export const functions = getFunctions(app, 'southamerica-east1');

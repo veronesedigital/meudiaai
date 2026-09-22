@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { auth } from '../services/firebaseConfig';
 
 export default function LoginScreen({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
@@ -15,38 +17,35 @@ export default function LoginScreen({ onLoginSuccess }) {
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
-
+      
       const ambiente = process.env.EXPO_PUBLIC_AMBIENTE;
 
       if (ambiente === 'desenvolvimento') {
+        // Simulação rápida de login para desenvolvimento
         setTimeout(() => {
           if (onLoginSuccess) {
-            onLoginSuccess({
-              user: { name: 'Usuário Teste 01', email: 'teste01@meudia.ai' },
-            });
+            onLoginSuccess({ user: { name: 'Usuário Teste' } });
           }
-          setLoading(false);
         }, 500);
-        return;
+      } else {
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        await GoogleSignin.signOut();
+        const userInfo = await GoogleSignin.signIn();
+        
+        // --- NOVO: Autenticar no Firebase com a credencial do Google ---
+        const credential = GoogleAuthProvider.credential(userInfo.data.idToken);
+        const userCredential = await signInWithCredential(auth, credential);
+
+        // Login com sucesso no Firebase, avança para a próxima tela
+        if (onLoginSuccess) {
+          onLoginSuccess(userCredential);
+        }
       }
 
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      const userInfo = await GoogleSignin.signIn();
-
-      if (onLoginSuccess) {
-        onLoginSuccess(userInfo);
-      }
-      setLoading(false);
     } catch (error) {
-      console.error('Google Sign-In Error Details:', error);
+      console.error('Erro no login com Google/Firebase:', error);
       setLoading(false);
-
-      let errorMessage = 'Não foi possível fazer o login com o Google.';
-      if (error.code === '10') {
-        errorMessage = 'Erro de Desenvolvedor (10): Verifique se o SHA-1 e o Client ID estão corretos no Google Cloud Console.';
-      }
-
-      Alert.alert('Erro no Login', errorMessage);
+      Alert.alert('Erro no Login', 'Não foi possível concluir o login com o Google. Tente novamente.');
     }
   };
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
 
@@ -30,10 +30,19 @@ export default function LoginScreen({ onLoginSuccess }) {
       } else {
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
         await GoogleSignin.signOut();
-        const userInfo = await GoogleSignin.signIn();
+        const signInResponse = await GoogleSignin.signIn();
+
+        if (!isSuccessResponse(signInResponse)) {
+          setLoading(false);
+          return;
+        }
+
+        const userInfo = signInResponse.data;
+        if (!userInfo.idToken) {
+          throw new Error('O Google não retornou um ID token. Verifique o webClientId.');
+        }
         
-        // --- NOVO: Autenticar no Firebase com a credencial do Google ---
-        const credential = GoogleAuthProvider.credential(userInfo.data.idToken);
+        const credential = GoogleAuthProvider.credential(userInfo.idToken);
         const userCredential = await signInWithCredential(auth, credential);
 
         // Login com sucesso no Firebase, avança para a próxima tela
@@ -45,7 +54,9 @@ export default function LoginScreen({ onLoginSuccess }) {
     } catch (error) {
       console.error('Erro no login com Google/Firebase:', error);
       setLoading(false);
-      Alert.alert('Erro no Login', 'Não foi possível concluir o login com o Google. Tente novamente.');
+      const errorCode = error?.code ? ` (${error.code})` : '';
+      const errorMessage = error?.message || 'Erro desconhecido';
+      Alert.alert('Erro no Login', `Não foi possível concluir o login com o Google${errorCode}.\n\n${errorMessage}`);
     }
   };
 
@@ -62,6 +73,7 @@ export default function LoginScreen({ onLoginSuccess }) {
       <View style={styles.loginContainer}>
         <Text style={styles.title}>Meu Dia AI</Text>
         <Text style={styles.subtitle}>Sou uma AI especialista em astrologia psicológica e humanista, e vou dar dicas incríveis para você planejar o seu dia</Text>
+        <Text style={styles.subtitle}>(V3)</Text>
         {loading ? (
           <ActivityIndicator size="large" color="#7b61ff" />
         ) : (
